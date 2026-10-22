@@ -12,7 +12,7 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// 获取任务列表，支持优先级筛选，按创建时间倒序
+// 获取任务列表，支持优先级筛选、创建时间倒序
 app.get('/api/tasks', async (req, res) => {
   const { priority } = req.query;
   let query = supabase.from('tasks').select('*').order('created_at', { ascending: false });
@@ -38,7 +38,7 @@ app.post('/api/tasks', async (req, res) => {
   res.json(data[0]);
 });
 
-// 修改完成状态
+// 切换完成状态
 app.patch('/api/tasks/:id', async (req, res) => {
   const { id } = req.params;
   const { completed } = req.body;
@@ -61,5 +61,7 @@ app.delete('/api/tasks/:id', async (req, res) => {
   res.json({ success: true });
 });
 
-// 【重点删掉原来的listen，换成这句给Vercel导出app】
-module.exports = app;
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`服务运行在 http://localhost:${PORT}`);
+});
