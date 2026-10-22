@@ -1,12 +1,12 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
@@ -56,12 +56,21 @@ app.delete('/api/tasks/:id', async (req, res) => {
   const { error } = await supabase.from('tasks').delete().eq('id', id);
   if (error) {
     console.error('删除失败：', error);
-    return res.status(500).json({ error });
+    return res.status(500).json({ success: false, error });
   }
   res.json({ success: true });
 });
 
+// ✅ 关键：根路由直接返回html，绕过 express.static
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/index.html'));
+});
+
+// 本地启动用，Vercel不会执行listen
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`服务运行在 http://localhost:${PORT}`);
+  console.log(`本地运行：http://localhost:${PORT}`);
 });
+
+// Vercel serverless 导出
+module.exports = app;
