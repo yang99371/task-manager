@@ -61,7 +61,5 @@ app.delete('/api/tasks/:id', async (req, res) => {
   res.json({ success: true });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`服务运行在 http://localhost:${PORT}`);
-});
+// 【重点删掉原来的listen，换成这句给Vercel导出app】
+module.exports = app;
